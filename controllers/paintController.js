@@ -4,46 +4,24 @@ const {Image} = require('../models/models')
 const uuid = require('uuid')
 const path = require('path');
 const fs = require('node:fs');
+const PaintingUtils = require('../utils/paintingUtils')
 
 class PaintController {
+
 
     async create(req, res, next) {
         try {
             const {title, desc, price, width, height, relativeSize, objectFit} = req.body;
             const {images} = req.files;
 
-            const imageFileNames = [];
 
-                console.log(req.files.images)
+            console.log(req.files.images)
 
 
             const painting = await Paint.create({title, desc, price, width, height, relativeSize, objectFit})
 
 
-
-            if (Array.isArray(images)) {
-                images.forEach(i => {
-                    let fileName = uuid.v4() + '.jpg';
-                    imageFileNames.push(fileName);
-                    i.mv(path.resolve(__dirname, '..', 'static', fileName))
-
-                    Image.create({
-                        name: fileName,
-                        paintId: painting.id
-                    })
-                })
-            } else {
-                let fileName = uuid.v4() + '.jpg';
-                imageFileNames.push(fileName);
-                images.mv(path.resolve(__dirname, '..', 'static', fileName))
-
-                Image.create({
-                    name: fileName,
-                    paintId: painting.id
-                })
-            }
-
-
+            const imageFileNames = await PaintingUtils.addImg(images, painting.id);
 
             const result = JSON.parse(JSON.stringify(painting));
             result.images = imageFileNames;
@@ -184,6 +162,50 @@ class PaintController {
             next(ApiError.badRequest(e.message))
 
         }
+    }
+
+    async updatePainting(req, res, next) {
+
+        try {
+
+            const {id, title, desc, price, width, height} = req.body;
+            let images = null;
+            let result = [];
+
+            if (req.files) {
+                images = req.files.images;
+            }
+
+            //const {images} = req.files;
+
+            console.log(req.files)
+
+            const painting = await Paint.findByPk(id);
+
+            painting.set({
+                title: title,
+                desc: desc,
+                price: price,
+                width: width,
+                height: height
+            })
+
+            if (images) {
+                const imageFileNames = await PaintingUtils.addImg(images, id)
+
+                result = imageFileNames;
+            }
+
+            await painting.save();
+
+            return res.status(200).json(result)
+
+        } catch (e) {
+
+            return next(ApiError.badRequest(e.message));
+
+        }
+
     }
 
 }
