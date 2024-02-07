@@ -1,5 +1,5 @@
 const ApiError = require('../error/ApiError')
-const {Paint, ObjectFit} = require('../models/models')
+const {Paint, ObjectFit, Material, Technique} = require('../models/models')
 const {Image} = require('../models/models')
 const uuid = require('uuid')
 const path = require('path');
@@ -11,15 +11,35 @@ class PaintController {
 
     async create(req, res, next) {
         try {
-            const {title, desc, price, width, height, relativeSize, objectFit} = req.body;
+            const {
+                title,
+                desc,
+                price,
+                width,
+                height,
+                relativeSize,
+                objectFit,
+                materialId,
+                techniqueId
+            } = req.body;
             const {images} = req.files;
 
+            console.log(materialId)
+            console.log(techniqueId)
+            //console.log(req.files.images)
 
-            console.log(req.files.images)
 
-
-            const painting = await Paint.create({title, desc, price, width, height, relativeSize, objectFit})
-
+            const painting = await Paint.create({
+                title,
+                desc,
+                price,
+                width,
+                height,
+                relativeSize,
+                objectFit,
+                materialId,
+                techniqueId
+            })
 
             const imageFileNames = await PaintingUtils.addImg(images, painting.id);
 
@@ -49,6 +69,8 @@ class PaintController {
             }
         );
 
+
+
         /*let images = []
 
         paintings.forEach(i => {
@@ -62,12 +84,34 @@ class PaintController {
         console.log(images)*/
 
         const result = JSON.parse(JSON.stringify(paintings));
-        result.forEach(painting => {
-            //i.image.forEach(image => image = image.name)
+
+        for (const painting of result) {
+
             for (let i = 0; i < painting.images.length; i++) {
                 painting.images[i] = painting.images[i].name;
             }
-        })
+
+            if (painting.materialId) {
+
+
+                const material = await Material.findByPk(painting.materialId)
+                painting.material = material
+            }
+
+            if (painting.techniqueId) {
+                const technique = await Technique.findByPk(painting.techniqueId)
+                painting.technique = technique
+            }
+
+            delete painting.materialId;
+            delete painting.techniqueId;
+
+        }
+
+       /* result.forEach(painting => {
+            //i.image.forEach(image => image = image.name)
+
+        })*/
 
         return res.json(result);
     }
@@ -168,7 +212,7 @@ class PaintController {
 
         try {
 
-            const {id, title, desc, price, width, height} = req.body;
+            const {id, title, desc, price, width, height, materialId, techniqueId} = req.body;
             let images = null;
             let result = [];
 
@@ -187,7 +231,9 @@ class PaintController {
                 desc: desc,
                 price: price,
                 width: width,
-                height: height
+                height: height,
+                materialId,
+                techniqueId
             })
 
             if (images) {
@@ -203,7 +249,6 @@ class PaintController {
         } catch (e) {
 
             return next(ApiError.badRequest(e.message));
-
         }
 
     }

@@ -25,8 +25,24 @@ const ObjectFit = sequelize.define('objectFit', {
     name: {type: DataTypes.STRING, unique: true,}
 })*/
 
+const Material = sequelize.define('material', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    name: {type: DataTypes.STRING, allowNull: false, unique: true}
+})
+
+const Technique = sequelize.define('technique', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    name: {type: DataTypes.STRING, allowNull: false, unique: true}
+})
+
 Paint.hasMany(Image, {as: 'images'});
 Image.belongsTo(Paint);
+
+Material.hasOne(Paint);
+Paint.belongsTo(Material);
+
+Technique.hasOne(Paint);
+Paint.belongsTo(Technique);
 
 /*
 ObjectFit.hasMany(Paint);
@@ -36,5 +52,7 @@ Paint.belongsTo(ObjectFit);
 module.exports = {
     Paint,
     Image,
+    Material,
+    Technique
     //ObjectFit
 }
