@@ -13,13 +13,13 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(cors({
     credentials: true,
-    origin: 'http://localhost:5173'
+    //origin: ['http://192.168.0.103:5173', 'http://kountd4i.beget.tech/']
+    origin: 'http://kountd4i.beget.tech'
 }));
 app.use(express.json());
 app.use(express.static(path.resolve(__dirname, 'static')));
 app.use(fileUpload({}));
 app.use('/api', router);
-
 
 app.use(errorHandler);
 
