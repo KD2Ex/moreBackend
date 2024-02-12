@@ -20,13 +20,16 @@ class PaintController {
                 relativeSize,
                 objectFit,
                 materialId,
-                techniqueId
+                techniqueId,
             } = req.body;
             const {images} = req.files;
 
             console.log(materialId)
             console.log(techniqueId)
-            //console.log(req.files.images)
+            console.log(images)
+
+            let order = await Paint.count();
+            ++order;
 
 
             const painting = await Paint.create({
@@ -38,13 +41,20 @@ class PaintController {
                 relativeSize,
                 objectFit,
                 materialId,
-                techniqueId
+                techniqueId,
+                order
             })
 
             const imageFileNames = await PaintingUtils.addImg(images, painting.id);
 
             const result = JSON.parse(JSON.stringify(painting));
             result.images = imageFileNames;
+
+
+            /*result.material = {
+                id: result.materialId,
+                name: result
+            }*/
             //res.json(painting)
             return res.json(result);
 
@@ -68,7 +78,6 @@ class PaintController {
                 ],
             }
         );
-
 
 
         /*let images = []
@@ -247,6 +256,30 @@ class PaintController {
         } catch (e) {
 
             return next(ApiError.badRequest(e.message));
+        }
+
+    }
+
+    async updateOrder(req, res, next) {
+
+        try {
+
+            const items = req.body;
+
+            console.log(items)
+
+            for (let i of items) {
+
+                await Paint.update({ order: i.order }, {
+                    where: {
+                        id: i.id
+                    }
+                })
+
+            }
+
+        } catch (e) {
+            return next(ApiError.badRequest(e.message))
         }
 
     }

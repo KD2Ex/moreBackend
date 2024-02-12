@@ -8,9 +8,16 @@ class UserController {
 
     }
 
+
+    async logout(req, res, next) {
+
+    }
+
     async check(req, res) {
 
     }
+
+
 
 }
 
