@@ -17,6 +17,7 @@ const Paint = sequelize.define('paint', {
 const Image = sequelize.define('image', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, allowNull: true},
+    order: {type: DataTypes.INTEGER }
 })
 /*
 const ObjectFit = sequelize.define('objectFit', {
