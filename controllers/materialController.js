@@ -1,7 +1,6 @@
 const ApiError = require('../error/ApiError')
 const {Material, Paint, LocaleText, Locale, MaterialLocaleText} = require("../models/models");
-const {logger} = require("sequelize/lib/utils/logger");
-const {sql} = require("sequelize")
+
 
 class MaterialController {
 
@@ -41,7 +40,7 @@ class MaterialController {
     async getAll(req, res, next) {
 
         try {
-            const {localeId} = req.body;
+            const {localeId} = req.query;
 
             const materials = await Material.findAll();
 
@@ -63,7 +62,7 @@ class MaterialController {
                     console.log(localeText.localeId)
                     console.log(localeId)
 
-                    if (localeText.localeId === localeId) {
+                    if (localeText.localeId == localeId) {
                         item.name = localeText.text;
 
                         console.log(localeText.text)
@@ -96,13 +95,11 @@ class MaterialController {
                 return next(ApiError.badRequest("Невозоможно удалить: Существуют картины с этим материалом"))
             }
 
-
             await Material.destroy({
                 where: {id}
             })
 
             return res.status(200).json("ok");
-
         } catch (e) {
             return next(ApiError.badRequest(e.message));
         }
