@@ -46,7 +46,8 @@ class PaintController {
                 order
             })
 
-            const imageFileNames = await PaintingUtils.addImg(images, painting.id, 0);
+            const imageFileNames = await PaintingUtils
+                .addImg(images, painting.id, 0, Image, "paint");
 
             const result = JSON.parse(JSON.stringify(painting));
             result.images = imageFileNames;
@@ -307,7 +308,8 @@ class PaintController {
             const maxOrder = Math.max(...json.images.map(i => i.order));
 
             if (images) {
-                const imageFileNames = await PaintingUtils.addImg(images, id, maxOrder + 1)
+                const imageFileNames = await PaintingUtils
+                    .addImg(images, id, maxOrder + 1, Image, "paint")
 
                 result = imageFileNames;
             }

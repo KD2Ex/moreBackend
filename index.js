@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(cors({
     credentials: true,
-    origin: ['http://192.168.0.104:5173', 'http://192.168.0.104:4173', 'http://kountd4i.beget.tech/']
+    origin: ['http://192.168.0.12:5173', 'http://192.168.0.12:4173', 'http://192.168.0.104:4173', 'http://kountd4i.beget.tech/']
     //origin: 'http://kountd4i.beget.tech'
 }));
 app.use(express.json());

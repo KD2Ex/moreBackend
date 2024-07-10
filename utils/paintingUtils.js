@@ -5,7 +5,7 @@ const path = require('path');
 
 class PaintingUtils {
 
-    async addImg(images, paintingId, startingPoint) {
+    async addImg(images, paintingId, startingPoint, table, tableName) {
 
         const imageFileNames = [];
 
@@ -15,22 +15,40 @@ class PaintingUtils {
                 imageFileNames.push({name: fileName, order: startingPoint + index});
                 i.mv(path.resolve(__dirname, '..', 'static', fileName))
 
-                Image.create({
-                    name: fileName,
-                    paintId: paintingId,
-                    order: startingPoint + index
-                })
+                if (tableName === "paint") {
+                    table.create({
+                        name: fileName,
+                        paintId: paintingId,
+                        order: startingPoint + index
+                    })
+                } else if (tableName === "project") {
+                    table.create({
+                        name: fileName,
+                        projectId: paintingId,
+                        order: startingPoint + index
+                    })
+                }
+
+
             })
         } else {
             let fileName = uuid.v4() + '.jpg';
             imageFileNames.push({name: fileName, order: startingPoint});
             images.mv(path.resolve(__dirname, '..', 'static', fileName))
 
-            await Image.create({
-                name: fileName,
-                paintId: paintingId,
-                order: startingPoint
-            })
+            if (tableName === "paint") {
+                await table.create({
+                    name: fileName,
+                    paintId: paintingId,
+                    order: startingPoint
+                })
+            } else if (tableName === "project") {
+                await table.create({
+                    name: fileName,
+                    projectId: paintingId,
+                    order: startingPoint
+                })
+            }
         }
 
         return imageFileNames;

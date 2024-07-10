@@ -46,6 +46,43 @@ const Token = sequelize.define('token', {
     refreshToken: {type: DataTypes.STRING, allowNull: false}
 })
 
+const Project = sequelize.define('project', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    title: {type: DataTypes.STRING, allowNull: false},
+    desc: {type: DataTypes.TEXT },
+    cost: {type: DataTypes.INTEGER },
+    levels: {type: DataTypes.INTEGER, allowNull: true},
+    area: {type: DataTypes.INTEGER, allowNull: true},
+    timePeriod: {type: DataTypes.STRING, allowNull: true},
+    address: {type: DataTypes.STRING, allowNull: true},
+    order: {type: DataTypes.INTEGER, allowNull: true},
+    height: {type: DataTypes.INTEGER, allowNull: true}
+})
+
+const ProjectImage = sequelize.define('projectImage', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    name: {type: DataTypes.STRING, allowNull: false},
+    order: {type: DataTypes.INTEGER }
+})
+
+const LocaleText = sequelize.define('localeText', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    text: {type: DataTypes.STRING, allowNull: false}
+})
+
+const Locale = sequelize.define("locale", {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    name: {type: DataTypes.STRING, allowNull: false}
+})
+
+const MaterialLocaleText = sequelize.define("materialLocaleText", {}, {timestamps: false})
+
+Material.belongsToMany(LocaleText, { through: MaterialLocaleText})
+LocaleText.belongsToMany(Material, { through: MaterialLocaleText})
+
+Locale.hasMany(LocaleText)
+LocaleText.belongsTo(Locale)
+
 User.hasOne(Token);
 Token.belongsTo(User);
 
@@ -58,6 +95,10 @@ Paint.belongsTo(Material);
 Technique.hasOne(Paint);
 Paint.belongsTo(Technique);
 
+Project.hasMany(ProjectImage, {as: 'images'})
+ProjectImage.belongsTo(Project)
+
+
 /*
 ObjectFit.hasMany(Paint);
 Paint.belongsTo(ObjectFit);
@@ -67,6 +108,10 @@ module.exports = {
     Paint,
     Image,
     Material,
-    Technique
-    //ObjectFit
+    Technique,
+    Project,
+    ProjectImage,
+    LocaleText,
+    Locale,
+    MaterialLocaleText
 }
