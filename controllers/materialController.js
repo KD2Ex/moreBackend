@@ -1,5 +1,5 @@
 const ApiError = require('../error/ApiError')
-const {Material, Paint, LocaleTextMaterial, } = require("../models/models");
+const {Material, Paint, LocaleTextMaterial, Locale, } = require("../models/models");
 
 class MaterialController {
 
@@ -47,7 +47,7 @@ class MaterialController {
             const materials = await Material.findAll();
             const result = JSON.parse(JSON.stringify(materials));
 
-            let i = 0;
+            const localeNames = await Locale.findAll();
 
             for (const item of result) {
 
@@ -57,15 +57,12 @@ class MaterialController {
                     }
                 })
 
-                for (const locale of locales) {
+                if (locales.length > 0) item.name = {}
 
-                    if (locale.localeId == localeId) {
-                        item.name = locale.text;
-                        console.log(locale.text)
-                        break;
-                    }
+                for (const locale of locales) {
+                    const localeName = localeNames.find(i => i.id === locale.localeId).name
+                    item.name[localeName] = locale.text;
                 }
-                i++;
             }
 
             console.log(result);

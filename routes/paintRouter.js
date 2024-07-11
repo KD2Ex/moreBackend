@@ -9,7 +9,7 @@ router.post('/update/:id', controller.updatePainting)
 router.post('/updateOrder', controller.updateOrder)
 router.get('/', controller.getAll)
 router.get('/filteredCount', controller.getFilteredCount)
-router.get('/:id', controller.getOne)
+//router.get('/:id', controller.getOne)
 router.delete('/:id', controller.delete)
 router.delete('/', controller.deleteAll)
 

@@ -1,4 +1,4 @@
-const {Technique, Paint, LocaleTextTechnique} = require("../models/models");
+const {Technique, Paint, LocaleTextTechnique, Locale} = require("../models/models");
 const ApiError = require("../error/ApiError");
 
 class TechniqueController {
@@ -40,13 +40,12 @@ class TechniqueController {
     async getAll(req, res, next) {
 
         try {
-
             const {localeId} = req.query;
 
             const techs = await Technique.findAll();
             const result = JSON.parse(JSON.stringify(techs));
 
-            let i = 0;
+            const localeNames = await Locale.findAll();
 
             for (const item of result) {
 
@@ -56,15 +55,12 @@ class TechniqueController {
                     }
                 })
 
-                for (const locale of locales) {
+                if (locales.length > 0) item.name = {}
 
-                    if (locale.localeId == localeId) {
-                        item.name = locale.text;
-                        console.log(locale.text)
-                        break;
-                    }
+                for (const locale of locales) {
+                    const localeName = localeNames.find(i => i.id === locale.localeId).name
+                    item.name[localeName] = locale.text;
                 }
-                i++;
             }
 
             console.log(result);
