@@ -65,15 +65,17 @@ const ProjectImage = sequelize.define('projectImage', {
     order: {type: DataTypes.INTEGER }
 })
 
+const Locale = sequelize.define("locale", {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    name: {type: DataTypes.STRING, allowNull: false}
+})
+
 const LocaleTextMaterial = sequelize.define('localeTextMaterial', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     text: {type: DataTypes.STRING, allowNull: false}
 })
 
-const Locale = sequelize.define("locale", {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.STRING, allowNull: false}
-})
+
 
 Material.hasMany(LocaleTextMaterial)
 LocaleTextMaterial.belongsTo(Material)

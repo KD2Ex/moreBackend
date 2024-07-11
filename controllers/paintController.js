@@ -1,5 +1,5 @@
 const ApiError = require('../error/ApiError')
-const {Paint, ObjectFit, Material, Technique} = require('../models/models')
+const {Paint, ObjectFit, Material, Technique, LocaleTextMaterial} = require('../models/models')
 const {Image} = require('../models/models')
 const uuid = require('uuid')
 const path = require('path');
@@ -71,7 +71,7 @@ class PaintController {
     async getAll(req, res, next) {
 
         try {
-            let {page, limit, materialId, techniqueId, sort} = req.query;
+            let {page, limit, materialId, techniqueId, sort, localeId} = req.query;
 
             materialId = +materialId
             techniqueId = +techniqueId
@@ -136,7 +136,16 @@ class PaintController {
 
                 if (painting.materialId) {
                     const material = await Material.findByPk(painting.materialId)
+                    const materialLocaleName = await LocaleTextMaterial.findOne({
+                        where: {
+                            materialId: material.id,
+                            localeId: localeId
+                        }
+                    })
+                    material.name = materialLocaleName ? materialLocaleName.text : material.name;
                     painting.material = material
+
+                    console.log(material)
 
                     /*if (materialId !== 0 && material.id === materialId) {
                         filteredPaintings.push(painting);
