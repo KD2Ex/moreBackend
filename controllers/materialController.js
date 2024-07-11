@@ -1,7 +1,6 @@
 const ApiError = require('../error/ApiError')
 const {Material, Paint, LocaleTextMaterial, } = require("../models/models");
 
-
 class MaterialController {
 
     async create(req, res, next) {
@@ -46,7 +45,6 @@ class MaterialController {
             const {localeId} = req.query;
 
             const materials = await Material.findAll();
-
             const result = JSON.parse(JSON.stringify(materials));
 
             let i = 0;
@@ -63,7 +61,6 @@ class MaterialController {
 
                     if (locale.localeId == localeId) {
                         item.name = locale.text;
-
                         console.log(locale.text)
                         break;
                     }

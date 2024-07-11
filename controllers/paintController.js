@@ -1,12 +1,9 @@
 const ApiError = require('../error/ApiError')
-const {Paint, ObjectFit, Material, Technique, LocaleTextMaterial} = require('../models/models')
+const {Paint, Material, Technique, LocaleTextMaterial, LocaleTextTechnique} = require('../models/models')
 const {Image} = require('../models/models')
-const uuid = require('uuid')
 const path = require('path');
 const fs = require('node:fs');
 const PaintingUtils = require('../utils/paintingUtils')
-const {Op, where} = require("sequelize");
-const {mapFinderOptions} = require("sequelize/lib/utils");
 
 class PaintController {
 
@@ -145,8 +142,6 @@ class PaintController {
                     material.name = materialLocaleName ? materialLocaleName.text : material.name;
                     painting.material = material
 
-                    console.log(material)
-
                     /*if (materialId !== 0 && material.id === materialId) {
                         filteredPaintings.push(painting);
                     }*/
@@ -154,6 +149,13 @@ class PaintController {
 
                 if (painting.techniqueId) {
                     const technique = await Technique.findByPk(painting.techniqueId)
+                    const techniqueLocaleName = await LocaleTextTechnique.findOne({
+                        where: {
+                            techniqueId: technique.id,
+                            localeId: localeId
+                        }
+                    })
+                    technique.name = techniqueLocaleName ? techniqueLocaleName.text : technique.name;
                     painting.technique = technique
 
                     /*if (techniqueId !== 0 && technique.id === techniqueId) {
@@ -163,7 +165,6 @@ class PaintController {
 
                 delete painting.materialId;
                 delete painting.techniqueId;
-
             }
 
             if (materialId !== 0) {
