@@ -22,7 +22,7 @@ class ProjectController {
             } = req.body
             const {images} = req.files;
 
-            let order = await Project.count();
+            let order = await Project.max('order');
             ++order;
 
             const project = await Project.create({
