@@ -27,9 +27,13 @@ class MaterialController {
 
                 result.push(locale)
             }
-
-            console.log(JSON.parse(JSON.stringify(result)))
-            return res.status(200).json(result);
+            const jsonResult = JSON.parse(JSON.stringify(result))
+            for (let item of jsonResult) {
+                item.entityId = item.materialId;
+                delete item.materialId;
+            }
+            console.log(jsonResult)
+            return res.status(200).json(jsonResult);
         } catch (e) {
 
             console.log(e.name)

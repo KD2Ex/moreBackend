@@ -29,8 +29,13 @@ class TechniqueController {
                 result.push(locale)
             }
 
-            console.log(JSON.parse(JSON.stringify(result)))
-            return res.status(200).json(result);
+            const jsonResult = JSON.parse(JSON.stringify(result))
+            for (let item of jsonResult) {
+                item.entityId = item.techniqueId;
+                delete item.techniqueId;
+            }
+            console.log(jsonResult)
+            return res.status(200).json(jsonResult);
 
         } catch (e) {
             return next(ApiError.badRequest(e.message));
