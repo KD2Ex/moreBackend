@@ -9,11 +9,15 @@ class MaterialController {
         try {
             const {names} = req.body;
 
+            console.log(names)
+
             const newMaterial = await Material.create(
                 {
                     name: names[0].text,
                 }
             )
+
+            const result = [];
 
             for (const item of names) {
                 const locale = await LocaleTextMaterial.create({
@@ -21,9 +25,12 @@ class MaterialController {
                     localeId: item.localeId,
                     materialId: newMaterial.id
                 })
+
+                result.push(locale)
             }
 
-            return res.status(200).json(newMaterial);
+            console.log(JSON.parse(JSON.stringify(result)))
+            return res.status(200).json(result);
         } catch (e) {
 
             console.log(e.name)
@@ -86,6 +93,12 @@ class MaterialController {
 
                 return next(ApiError.badRequest("Невозоможно удалить: Существуют картины с этим материалом"))
             }
+
+            await LocaleTextMaterial.destroy({
+                where: {
+                    materialId: +id
+                }
+            })
 
             await Material.destroy({
                 where: {id}
