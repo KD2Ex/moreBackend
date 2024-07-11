@@ -1,5 +1,5 @@
 const ApiError = require('../error/ApiError')
-const {Material, Paint, LocaleText, Locale, MaterialLocaleText} = require("../models/models");
+const {Material, Paint, LocaleTextMaterial, } = require("../models/models");
 
 
 class MaterialController {
@@ -16,14 +16,10 @@ class MaterialController {
             )
 
             for (const item of names) {
-                const locale = await LocaleText.create({
+                const locale = await LocaleTextMaterial.create({
                     text: item.text,
-                    localeId: item.localeId
-                })
-
-                await MaterialLocaleText.create({
-                    materialId: newMaterial.id,
-                    localeTextId: locale.id
+                    localeId: item.localeId,
+                    materialId: newMaterial.id
                 })
             }
 
@@ -50,22 +46,18 @@ class MaterialController {
 
             for (const item of result) {
 
-                const locales = await MaterialLocaleText.findAll({
+                const locales = await LocaleTextMaterial.findAll({
                     where: {
                         materialId: item.id
                     }
                 })
 
                 for (const locale of locales) {
-                    const localeText = await LocaleText.findByPk(locale.localeTextId)
 
-                    console.log(localeText.localeId)
-                    console.log(localeId)
+                    if (locale.localeId == localeId) {
+                        item.name = locale.text;
 
-                    if (localeText.localeId == localeId) {
-                        item.name = localeText.text;
-
-                        console.log(localeText.text)
+                        console.log(locale.text)
                         break;
                     }
                 }

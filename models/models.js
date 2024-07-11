@@ -65,7 +65,7 @@ const ProjectImage = sequelize.define('projectImage', {
     order: {type: DataTypes.INTEGER }
 })
 
-const LocaleText = sequelize.define('localeText', {
+const LocaleTextMaterial = sequelize.define('localeTextMaterial', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     text: {type: DataTypes.STRING, allowNull: false}
 })
@@ -75,13 +75,11 @@ const Locale = sequelize.define("locale", {
     name: {type: DataTypes.STRING, allowNull: false}
 })
 
-const MaterialLocaleText = sequelize.define("materialLocaleText", {}, {timestamps: false})
+Material.hasMany(LocaleTextMaterial)
+LocaleTextMaterial.belongsTo(Material)
 
-Material.belongsToMany(LocaleText, { through: MaterialLocaleText})
-LocaleText.belongsToMany(Material, { through: MaterialLocaleText})
-
-Locale.hasMany(LocaleText)
-LocaleText.belongsTo(Locale)
+Locale.hasMany(LocaleTextMaterial)
+LocaleTextMaterial.belongsTo(Locale)
 
 User.hasOne(Token);
 Token.belongsTo(User);
@@ -98,12 +96,6 @@ Paint.belongsTo(Technique);
 Project.hasMany(ProjectImage, {as: 'images'})
 ProjectImage.belongsTo(Project)
 
-
-/*
-ObjectFit.hasMany(Paint);
-Paint.belongsTo(ObjectFit);
-*/
-
 module.exports = {
     Paint,
     Image,
@@ -111,7 +103,6 @@ module.exports = {
     Technique,
     Project,
     ProjectImage,
-    LocaleText,
     Locale,
-    MaterialLocaleText
+    LocaleTextMaterial,
 }

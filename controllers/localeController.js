@@ -13,6 +13,8 @@ class LocaleController {
 
         } catch (e) {
 
+            return next(ApiError.badRequest(e.message, e.name))
+
         }
 
     }
