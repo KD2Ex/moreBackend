@@ -26,9 +26,8 @@ class PaintController {
             console.log(techniqueId)
             console.log(images)
 
-            let order = await Paint.count();
+            let order = await Paint.max('order');
             ++order;
-
 
             const painting = await Paint.create({
                 title,
