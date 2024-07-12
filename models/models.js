@@ -87,6 +87,20 @@ const LocaleTextPainting = sequelize.define('localeTextPainting', {
     price: {type: DataTypes.STRING, allowNull: false},
 })
 
+const LocaleTextProject = sequelize.define('localeTextProject', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    title: {type: DataTypes.STRING, allowNull: false},
+    desc: {type: DataTypes.STRING, allowNull: false},
+    cost: {type: DataTypes.STRING, allowNull: false},
+    address: {type: DataTypes.STRING, allowNull: false},
+    timePeriod: {type: DataTypes.STRING, allowNull: false},
+}, {timestamps: false})
+
+Project.hasMany(LocaleTextProject)
+LocaleTextProject.belongsTo(Project)
+
+Locale.hasMany(LocaleTextProject)
+LocaleTextProject.belongsTo(Locale)
 
 Paint.hasMany(LocaleTextPainting)
 LocaleTextPainting.belongsTo(Paint)
@@ -131,5 +145,6 @@ module.exports = {
     Locale,
     LocaleTextMaterial,
     LocaleTextTechnique,
-    LocaleTextPainting
+    LocaleTextPainting,
+    LocaleTextProject
 }
