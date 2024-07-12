@@ -4,6 +4,7 @@ const {Image} = require('../models/models')
 const path = require('path');
 const fs = require('node:fs');
 const PaintingUtils = require('../utils/paintingUtils')
+const Utilities = require('../utils/utilities')
 
 class PaintController {
 
@@ -29,10 +30,15 @@ class PaintController {
             let order = await Paint.max('order');
             ++order;
 
+            const locales = await Locale.findAll();
+
+            const [localeTitles, localeDesc, localePrice] =
+                Utilities.extractLocaleObjects([title, desc, price])
+
             const painting = await Paint.create({
                 title,
                 desc,
-                price,
+                price: 0,
                 width,
                 height,
                 relativeSize,
@@ -44,6 +50,17 @@ class PaintController {
 
             const imageFileNames = await PaintingUtils
                 .addImg(images, painting.id, 0, Image, "paint");
+
+            for (const locale of locales) {
+
+                const localeTextPainting = await LocaleTextPainting.create({
+                    title: localeTitles[locale.name],
+                    desc: localeDesc[locale.name],
+                    price: localePrice[locale.name],
+                    localeId: locale.id,
+                    paintId: painting.id
+                })
+            }
 
             const result = JSON.parse(JSON.stringify(painting));
             result.images = imageFileNames;
@@ -227,22 +244,6 @@ class PaintController {
         }
     }
 
-    async getOne(req, res, next) {
-        const {id} = req.params
-
-        if (!id) {
-            return next(ApiError.badRequest('not a valid id'))
-        }
-
-        const painting = await Paint.findOne(
-            {
-                where: {id},
-                include: [{model: Image, as: 'image'}]
-            },
-        )
-
-        return res.json(painting)
-    }
 
     async delete(req, res, next) {
 
@@ -333,20 +334,8 @@ class PaintController {
 
             const locales = await Locale.findAll();
 
-            const titleSplit = title.split(':')
-            const descSplit = desc.split(':')
-            const priceSplit = price.split(':')
-
-            const localeTitles = {};
-            const localeDesc = {};
-            const localePrice = {};
-
-            for (let i = 0; i < titleSplit.length; i += 2) {
-                localeTitles[titleSplit[i]] = titleSplit[i + 1];
-                localeDesc[descSplit[i]] = descSplit[i + 1];
-                localePrice[priceSplit[i]] = priceSplit[i + 1];
-            }
-
+            const [localeTitles, localeDesc, localePrice] =
+                Utilities.extractLocaleObjects([title, desc, price])
             console.log(req.files)
 
             const painting = await Paint.findByPk(id, {
