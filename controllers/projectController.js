@@ -33,7 +33,8 @@ class ProjectController {
                 area,
                 timePeriod,
                 address,
-                order
+                order,
+                height: 400
             })
 
             const createdImages = await PaintingUtils
@@ -185,7 +186,9 @@ class ProjectController {
 
             images.forEach(i => {
                 fs.unlink(path.resolve(__dirname, '..', 'static', i.name), (err) => {
-                    if (err) throw err;
+                    if (err) {
+                        return next(ApiError.badRequest(err.message))
+                    }
                     console.log('file was deleted')
                 })
             })

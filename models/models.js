@@ -96,6 +96,35 @@ const LocaleTextProject = sequelize.define('localeTextProject', {
     timePeriod: {type: DataTypes.STRING, allowNull: false},
 }, {timestamps: false})
 
+const Post = sequelize.define('post', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    socialLink: {type: DataTypes.STRING, allowNull: false},
+}, )
+
+const PostParagraph = sequelize.define('postParagraph', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    order: {type: DataTypes.INTEGER},
+    // text style/formatting?
+}, {timestamps: false})
+
+const PostImage = sequelize.define('postImage', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    name: {type: DataTypes.STRING, allowNull: false},
+    order: {type: DataTypes.INTEGER },
+    relativeSize: {type: DataTypes.INTEGER },
+}, {timestamps: false})
+
+const LocalePost = sequelize.define('localePost', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    title: {type: DataTypes.STRING, allowNull: false},
+}, {timestamps: false})
+
+const LocalePostParagraph = sequelize.define('localePostParagraph', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    text: {type: DataTypes.STRING, allowNull: false},
+}, {timestamps: false})
+
+
 Project.hasMany(LocaleTextProject)
 LocaleTextProject.belongsTo(Project)
 

@@ -7,6 +7,7 @@ const objectFitRouter = require('./objectFitRouter')
 const techniqueRouter = require('./techniqueRouter')
 const materialRouter = require('./materialRouter')
 const projectRouter = require('./projectRouter')
+const projectImageRouter = require('./projectImageRouter')
 const localeTextRouter = require('./localeRouter')
 
 router.use('/user', userRouter)
@@ -16,6 +17,7 @@ router.use('/fit', objectFitRouter)
 router.use('/material', materialRouter)
 router.use('/technique', techniqueRouter)
 router.use('/project', projectRouter)
+router.use('/projectImage', projectImageRouter)
 router.use('/locale', localeTextRouter)
 
 module.exports = router
