@@ -1,5 +1,7 @@
 const ApiError = require('../error/ApiError')
-const {Paint, Material, Technique, LocaleTextMaterial, LocaleTextTechnique, LocaleTextPainting, Locale} = require('../models/models')
+const {Paint, Material, Technique, LocaleTextMaterial, LocaleTextTechnique, LocaleTextPainting, Locale,
+    LocaleTextProject
+} = require('../models/models')
 const {Image} = require('../models/models')
 const path = require('path');
 const fs = require('node:fs');
@@ -149,7 +151,6 @@ class PaintController {
                     }
                 })
 
-
                 if (locales.length > 0) {
                     painting.title = {};
                     painting.price = {};
@@ -262,6 +263,12 @@ class PaintController {
                 if (err) throw err;
                 console.log('file was deleted')
             })
+        })
+
+        await LocaleTextPainting.destroy({
+            where: {
+                paintId: id
+            }
         })
 
         await Image.destroy(

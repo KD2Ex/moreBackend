@@ -1,8 +1,9 @@
 const ApiError = require('../error/ApiError')
-const {Project, ProjectImage} = require("../models/models");
+const {Project, ProjectImage, Locale, LocaleTextProject, LocaleTextPainting} = require("../models/models");
 const PaintingUtils = require('../utils/paintingUtils')
 const fs = require("node:fs");
 const path = require("path");
+const Utilities = require('../utils/utilities')
 
 
 class ProjectController {
@@ -25,10 +26,14 @@ class ProjectController {
             let order = await Project.max('order');
             ++order;
 
+            const locales = await Locale.findAll();
+            const [localeTitles, localeDesc, localeCost, localeTimePeriod, localeAddress] =
+                Utilities.extractLocaleObjects([title, desc, cost, timePeriod, address])
+
             const project = await Project.create({
                 title,
                 desc,
-                cost,
+                cost: 0,
                 levels,
                 area,
                 timePeriod,
@@ -39,6 +44,18 @@ class ProjectController {
 
             const createdImages = await PaintingUtils
                 .addImg(images, project.id, 0, ProjectImage, "project")
+
+            for (const locale of locales) {
+                await LocaleTextProject.create({
+                    projectId: project.id,
+                    localeId: locale.id,
+                    title: localeTitles[locale.name],
+                    desc: localeDesc[locale.name],
+                    cost: localeCost[locale.name],
+                    timePeriod: localeTimePeriod[locale.name],
+                    address: localeTimePeriod[locale.name],
+                })
+            }
 
             const result = JSON.parse(JSON.stringify(project))
             result.images = createdImages
@@ -56,6 +73,14 @@ class ProjectController {
         try {
 
             let {page, limit} = req.query
+
+            const locales = await Locale.findAll();
+
+            const localeMap = {};
+            for (const item of locales) {
+                localeMap[item.id] = item.name
+            }
+
             const { count, rows } = await Project.findAndCountAll(
                 {
                     include: [
@@ -82,6 +107,30 @@ class ProjectController {
 
             for (const proj of result.items) {
                 proj.images.sort((a, b) => a.order - b.order)
+
+                const localeNames = await LocaleTextProject.findAll({
+                    where: {
+                        projectId: proj.id
+                    }
+                })
+
+                if (localeNames.length > 0) {
+                    proj.title = {}
+                    proj.desc = {}
+                    proj.cost = {}
+                    proj.address = {}
+                    proj.timePeriod = {}
+                }
+
+                for (let localeName of localeNames) {
+
+                    const localeId = localeMap[localeName.localeId]
+                    proj.title[localeId] = localeName.title;
+                    proj.desc[localeId] = localeName.desc;
+                    proj.cost[localeId] = localeName.cost;
+                    proj.address[localeId] = localeName.address;
+                    proj.timePeriod[localeId] = localeName.timePeriod;
+                }
             }
 
             res.json(result)
@@ -94,11 +143,11 @@ class ProjectController {
 
     async update(req, res, next) {
         try {
-
             const {
                 id,
                 title,
                 desc,
+                cost,
                 levels,
                 area,
                 timePeriod,
@@ -111,6 +160,13 @@ class ProjectController {
                 images = req.files.images
             }
 
+            const locales = await Locale.findAll();
+
+            const [localeTitles, localeDesc, localeCost, localeTimePeriod, localeAddress] =
+                Utilities.extractLocaleObjects([title, desc, cost, timePeriod, address])
+
+            console.log(req.files)
+
             const project = await Project.findByPk(id, {
                 include: [
                     {
@@ -122,13 +178,29 @@ class ProjectController {
             })
 
             project.set({
-                title,
-                desc,
                 levels,
                 area,
-                timePeriod,
-                address
             })
+
+            const localeTexts = await LocaleTextProject.findAll({
+                where: {
+                    projectId: project.id
+                }
+            })
+
+            for (const item of localeTexts) {
+
+                const locale = locales.find(i => i.id === item.localeId).name;
+
+                item.set({
+                    title: localeTitles[locale],
+                    desc: localeDesc[locale],
+                    cost: localeCost[locale],
+                    timePeriod: localeTimePeriod[locale],
+                    address: localeAddress[locale],
+                })
+                await item.save();
+            }
 
             const json = JSON.parse(JSON.stringify(project));
 
@@ -180,6 +252,7 @@ class ProjectController {
                 return next(ApiError.badRequest('id is required'))
             }
 
+
             const images = await ProjectImage.findAll({
                 where: {projectId: id}
             })
@@ -191,6 +264,12 @@ class ProjectController {
                     }
                     console.log('file was deleted')
                 })
+            })
+
+            await LocaleTextProject.destroy({
+                where: {
+                    projectId: id
+                }
             })
 
             await ProjectImage.destroy({
