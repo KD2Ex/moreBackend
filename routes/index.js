@@ -9,6 +9,7 @@ const materialRouter = require('./materialRouter')
 const projectRouter = require('./projectRouter')
 const projectImageRouter = require('./projectImageRouter')
 const localeTextRouter = require('./localeRouter')
+const postRouter = require('./postRouter')
 
 router.use('/user', userRouter)
 router.use('/paint', paintRouter)
@@ -19,6 +20,7 @@ router.use('/technique', techniqueRouter)
 router.use('/project', projectRouter)
 router.use('/projectImage', projectImageRouter)
 router.use('/locale', localeTextRouter)
+router.use('/post', postRouter)
 
 module.exports = router
 

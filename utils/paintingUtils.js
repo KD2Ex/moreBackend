@@ -5,7 +5,7 @@ const path = require('path');
 
 class PaintingUtils {
 
-    async addImg(images, paintingId, startingPoint, table, tableName) {
+    async addImg(images, paintingId, startingPoint, table) {
 
         const imageFileNames = [];
 
@@ -15,20 +15,11 @@ class PaintingUtils {
                 imageFileNames.push({name: fileName, order: startingPoint + index});
                 i.mv(path.resolve(__dirname, '..', 'static', fileName))
 
-                if (tableName === "paint") {
-                    table.create({
-                        name: fileName,
-                        paintId: paintingId,
-                        order: startingPoint + index
-                    })
-                } else if (tableName === "project") {
-                    table.create({
-                        name: fileName,
-                        projectId: paintingId,
-                        order: startingPoint + index
-                    })
-                }
-
+                 table.create({
+                    name: fileName,
+                    paintId: paintingId,
+                    order: startingPoint + index
+                })
 
             })
         } else {
@@ -36,19 +27,11 @@ class PaintingUtils {
             imageFileNames.push({name: fileName, order: startingPoint});
             images.mv(path.resolve(__dirname, '..', 'static', fileName))
 
-            if (tableName === "paint") {
-                await table.create({
-                    name: fileName,
-                    paintId: paintingId,
-                    order: startingPoint
-                })
-            } else if (tableName === "project") {
-                await table.create({
-                    name: fileName,
-                    projectId: paintingId,
-                    order: startingPoint
-                })
-            }
+            await table.create({
+                name: fileName,
+                paintId: paintingId,
+                order: startingPoint
+            })
         }
 
         return imageFileNames;

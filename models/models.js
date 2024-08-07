@@ -98,8 +98,8 @@ const LocaleTextProject = sequelize.define('localeTextProject', {
 
 const Post = sequelize.define('post', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    socialLink: {type: DataTypes.STRING, allowNull: false},
-}, )
+    socialLink: {type: DataTypes.STRING, allowNull: true},
+}, {timestamps: false})
 
 const PostParagraph = sequelize.define('postParagraph', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -124,6 +124,23 @@ const LocalePostParagraph = sequelize.define('localePostParagraph', {
     text: {type: DataTypes.STRING, allowNull: false},
 }, {timestamps: false})
 
+Locale.hasMany(LocalePostParagraph)
+LocalePostParagraph.belongsTo(Locale)
+
+Locale.hasMany(LocalePost)
+LocalePost.belongsTo(Locale)
+
+PostParagraph.hasMany(LocalePostParagraph)
+LocalePostParagraph.belongsTo(PostParagraph)
+
+Post.hasMany(PostImage)
+PostImage.belongsTo(Post)
+
+Post.hasMany(PostParagraph)
+PostParagraph.belongsTo(Post)
+
+Post.hasMany(LocalePost)
+LocalePost.belongsTo(Post)
 
 Project.hasMany(LocaleTextProject)
 LocaleTextProject.belongsTo(Project)
@@ -175,5 +192,10 @@ module.exports = {
     LocaleTextMaterial,
     LocaleTextTechnique,
     LocaleTextPainting,
-    LocaleTextProject
+    LocaleTextProject,
+    Post,
+    LocalePost,
+    PostParagraph,
+    LocalePostParagraph,
+    PostImage
 }

@@ -1,13 +1,13 @@
 const Router = require('express')
 const router = new Router();
-const controller = require('../controllers/projectController')
+const controller = require('../controllers/postController')
 
 router.post('/', controller.create)
+router.post('/addImage', controller.addImage)
+router.post('/test', controller.blobTest)
 router.post('/update/:id', controller.update)
-router.post('/updateOrder', controller.updateOrder)
-router.post('/updateHeight', controller.updateHeight)
 router.get('/', controller.getAll)
+router.get('/:id', controller.getOne)
 router.delete('/:id', controller.delete)
-router.delete('/', controller.deleteAll)
 
 module.exports = router;

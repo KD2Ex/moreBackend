@@ -27,7 +27,6 @@ class PaintController {
 
             console.log(materialId)
             console.log(techniqueId)
-            console.log(images)
 
             let order = await Paint.max('order');
             ++order;
@@ -51,7 +50,7 @@ class PaintController {
             })
 
             const imageFileNames = await PaintingUtils
-                .addImg(images, painting.id, 0, Image, "paint");
+                .addImg(images, painting.id, 0, Image);
 
             for (const locale of locales) {
 
@@ -107,21 +106,15 @@ class PaintController {
                     break;
             }
 
-            console.log([...order])
-
-            const offset = (page - 1) * limit ;
             const paintings = await Paint.findAll(
                 {
                     include: [
                         {
                             model: Image, as: 'images',
-                            attributes: ['name', 'order']
+                            attributes: ['name', 'order'],
                         },
                     ],
                     order: [...order],
-                    /*limit: limit,
-                    offset: offset,
-                    distinct: true*/
                 }
             );
 
@@ -129,11 +122,9 @@ class PaintController {
 
             const totalCount = await Paint.count();
 
-            const totalElements = paintings.length;
             const resultPaintings = JSON.parse(JSON.stringify(paintings.slice(page * limit - limit, limit * page)));
             let filteredPaintings = resultPaintings;
 
-            console.log(page, limit)
 
             const totalPages = Math.ceil(totalCount / limit);
 
@@ -176,45 +167,77 @@ class PaintController {
 
 
                 painting.images.sort((a, b) => a.order - b.order)
+                //const material = await Material.findByPk(painting.materialId)
+                //const technique = await Technique.findByPk(painting.techniqueId)
 
-                if (painting.materialId) {
-                    const material = await Material.findByPk(painting.materialId)
-                    const materialLocaleNames = await LocaleTextMaterial.findAll({
+                const [material, technique] = await Promise.all([
+                    Material.findByPk(painting.materialId),
+                    Technique.findByPk(painting.techniqueId)
+                ])
+
+                const [materialLocaleNames, techniqueLocaleNames] = await Promise.all([
+                    LocaleTextMaterial.findAll({
                         where: {
                             materialId: material.id,
                         }
+                    }),
+                    LocaleTextTechnique.findAll({
+                        where: {
+                            techniqueId: technique.id,
+                        }
                     })
+                ])
 
-                    const materialNames = {}
-                    materialLocaleNames.forEach(i => {
-                        const localeName = localeNames.find(lName => lName.id === i.localeId).name
-                        materialNames[localeName] = i.text;
-                    })
+               /* const materialLocaleNames = await LocaleTextMaterial.findAll({
+                    where: {
+                        materialId: material.id,
+                    }
+                })
 
-                    material.name = materialLocaleNames ? materialNames : material.name;
-                    painting.material = material
+                const techniqueLocaleNames = await LocaleTextTechnique.findAll({
+                    where: {
+                        techniqueId: technique.id,
+                    }
+                })*/
 
+                const materialNames = {}
+                const techniqueNames = {}
+
+                console.log(JSON.parse(JSON.stringify(localeNames)))
+
+                for (let i = 0; i < localeNames.length; i++) {
+                    console.log(localeNames[i].name)
+                    console.log(materialLocaleNames[i]?.text)
+
+                    materialNames[localeNames[i].name] = materialLocaleNames[i].text;
+                    techniqueNames[localeNames[i].name] = techniqueLocaleNames[i].text;
+                }
+
+                material.name = materialLocaleNames ? materialNames : material.name;
+                painting.material = material
+
+                technique.name = techniqueLocaleNames ? techniqueNames : technique.name;
+                painting.technique = technique
+
+
+               /* materialLocaleNames.forEach(i => {
+                    const localeName = localeNames.find(lName => lName.id === i.localeId).name
+                    materialNames[localeName] = i.text;
+                })
+                techniqueLocaleNames.forEach(i => {
+                    const localeName = localeNames.find(lName => lName.id === i.localeId).name
+                    techniqueNames[localeName] = i.text;
+                })*/
+
+
+                if (painting.materialId) {
                     /*if (materialId !== 0 && material.id === materialId) {
                         filteredPaintings.push(painting);
                     }*/
                 }
 
                 if (painting.techniqueId) {
-                    const technique = await Technique.findByPk(painting.techniqueId)
-                    const techniqueLocaleNames = await LocaleTextTechnique.findAll({
-                        where: {
-                            techniqueId: technique.id,
-                        }
-                    })
 
-                    const techniqueNames = {}
-                    techniqueLocaleNames.forEach(i => {
-                        const localeName = localeNames.find(lName => lName.id === i.localeId).name
-                        techniqueNames[localeName] = i.text;
-                    })
-
-                    technique.name = techniqueLocaleNames ? techniqueNames : technique.name;
-                    painting.technique = technique
 
                     /*if (techniqueId !== 0 && technique.id === techniqueId) {
                         filteredPaintings.push(painting);
@@ -383,7 +406,7 @@ class PaintController {
 
             if (images) {
                 const imageFileNames = await PaintingUtils
-                    .addImg(images, id, maxOrder + 1, Image, "paint")
+                    .addImg(images, id, maxOrder + 1, Image)
 
                 result = imageFileNames;
             }

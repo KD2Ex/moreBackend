@@ -69,7 +69,7 @@ class MaterialController {
                 }
             }
 
-            console.log(result);
+           //console.log(result);
             return res.json(result);
         } catch (e) {
             return next(ApiError.badRequest(e.message));

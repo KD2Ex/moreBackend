@@ -43,7 +43,7 @@ class ProjectController {
             })
 
             const createdImages = await PaintingUtils
-                .addImg(images, project.id, 0, ProjectImage, "project")
+                .addImg(images, project.id, 0, ProjectImage)
 
             for (const locale of locales) {
                 await LocaleTextProject.create({
@@ -210,7 +210,7 @@ class ProjectController {
                 const maxImagesOrder = Math.max(...json.images.map(i => i.order))
 
                 resultImages = await PaintingUtils
-                    .addImg(images, id, maxImagesOrder + 1, ProjectImage, "project")
+                    .addImg(images, id, maxImagesOrder + 1, ProjectImage)
 
             }
 
