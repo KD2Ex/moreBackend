@@ -1,6 +1,8 @@
-const {Post, PostParagraph, LocalePostParagraph, Locale, LocalePost} = require("../models/models");
+const {Post, PostParagraph, LocalePostParagraph, Locale, LocalePost, PostImage} = require("../models/models");
 const ApiError = require('../error/ApiError')
 const {logger} = require("sequelize/lib/utils/logger");
+const uuid = require("uuid");
+const path = require("path");
 
 class PostController {
 
@@ -96,10 +98,32 @@ class PostController {
     async addImage(req, res, next) {
         try {
 
+            const {id} = req.params;
 
-            const {images} = req.files;
+            console.log(req.body)
+            console.log(req.files)
 
+            const resultJSON = {
+                images: []
+            }
 
+            for (const prop of Object.getOwnPropertyNames(req.body)) {
+                const info = JSON.parse(req.body[prop])
+                const image = req.files[prop]
+
+                let fileName = uuid.v4() + '.jpg';
+                resultJSON.images.push({name: fileName, order: info['order'], size: info['size']});
+                image.mv(path.resolve(__dirname, '..', 'static', fileName))
+
+                await PostImage.create({
+                    name: fileName,
+                    order: info['order'],
+                    relativeSize: info['size'],
+                    postId: 16
+                })
+            }
+
+            return res.status(200).json(resultJSON);
 
         } catch (e) {
 
@@ -109,7 +133,9 @@ class PostController {
     async getOne(req, res, next) {
         const {id} = req.params;
 
-        const resultJSON = []
+        const resultJSON = {}
+        resultJSON.blocks = []
+
 
         const post = await Post.findOne({
             where: {
@@ -117,11 +143,13 @@ class PostController {
             }
         })
 
-/*        const titles = await LocalePost.findAll({
+        const titles = await LocalePost.findAll({
             where: {
                 postId: post.id
             }
-        })*/
+        })
+
+        resultJSON.title = titles
 
         const paragraphs = await PostParagraph.findAll({
             where: {
@@ -149,7 +177,7 @@ class PostController {
                     text: lP.text
                 })
             }
-            resultJSON.push(block)
+            resultJSON.blocks.push(block)
         }
 
         //find images

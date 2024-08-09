@@ -179,12 +179,14 @@ class PaintController {
                     LocaleTextMaterial.findAll({
                         where: {
                             materialId: material.id,
-                        }
+                        },
+                        order: ["localeId"]
                     }),
                     LocaleTextTechnique.findAll({
                         where: {
                             techniqueId: technique.id,
-                        }
+                        },
+                        order: ["localeId"]
                     })
                 ])
 
@@ -208,6 +210,9 @@ class PaintController {
                 for (let i = 0; i < localeNames.length; i++) {
                     console.log(localeNames[i].name)
                     console.log(materialLocaleNames[i]?.text)
+                    console.log(materialLocaleNames[i])
+
+
 
                     materialNames[localeNames[i].name] = materialLocaleNames[i].text;
                     techniqueNames[localeNames[i].name] = techniqueLocaleNames[i].text;

@@ -3,7 +3,7 @@ const router = new Router();
 const controller = require('../controllers/postController')
 
 router.post('/', controller.create)
-router.post('/addImage', controller.addImage)
+router.post('/addImage/:id', controller.addImage)
 router.post('/test', controller.blobTest)
 router.post('/update/:id', controller.update)
 router.get('/', controller.getAll)
