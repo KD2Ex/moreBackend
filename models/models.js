@@ -90,7 +90,7 @@ const LocaleTextPainting = sequelize.define('localeTextPainting', {
 const LocaleTextProject = sequelize.define('localeTextProject', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     title: {type: DataTypes.STRING, allowNull: false},
-    desc: {type: DataTypes.STRING, allowNull: false},
+    desc: {type: DataTypes.STRING(2000), allowNull: false},
     cost: {type: DataTypes.STRING, allowNull: false},
     address: {type: DataTypes.STRING, allowNull: false},
     timePeriod: {type: DataTypes.STRING, allowNull: false},
@@ -121,7 +121,7 @@ const LocalePost = sequelize.define('localePost', {
 
 const LocalePostParagraph = sequelize.define('localePostParagraph', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    text: {type: DataTypes.STRING, allowNull: false},
+    text: {type: DataTypes.STRING(2000), allowNull: false},
 }, {timestamps: false})
 
 Locale.hasMany(LocalePostParagraph)
@@ -169,8 +169,13 @@ LocaleTextMaterial.belongsTo(Locale)
 User.hasOne(Token);
 Token.belongsTo(User);
 
-Paint.hasMany(Image, {as: 'images'});
-Image.belongsTo(Paint);
+Paint.hasMany(Image, {
+    as: 'images',
+    foreignKey: 'entityId'
+});
+Image.belongsTo(Paint, {
+    foreignKey: 'entityId'
+});
 
 Material.hasOne(Paint);
 Paint.belongsTo(Material);
@@ -178,8 +183,14 @@ Paint.belongsTo(Material);
 Technique.hasOne(Paint);
 Paint.belongsTo(Technique);
 
-Project.hasMany(ProjectImage, {as: 'images'})
-ProjectImage.belongsTo(Project)
+Project.hasMany(ProjectImage, {
+    as: 'images',
+    foreignKey: 'entityId'
+})
+ProjectImage.belongsTo(Project, {
+    foreignKey: 'entityId'
+})
+
 
 module.exports = {
     Paint,

@@ -2,10 +2,13 @@ const {Image, Paint} = require('../models/models')
 const uuid = require('uuid')
 const path = require('path');
 
+const alias = {
+
+}
 
 class PaintingUtils {
 
-    async addImg(images, paintingId, startingPoint, table) {
+    async addImg(images, id, startingPoint, table) {
 
         const imageFileNames = [];
 
@@ -17,7 +20,7 @@ class PaintingUtils {
 
                  table.create({
                     name: fileName,
-                    paintId: paintingId,
+                    entityId: id,
                     order: startingPoint + index
                 })
 
@@ -29,7 +32,7 @@ class PaintingUtils {
 
             await table.create({
                 name: fileName,
-                paintId: paintingId,
+                entityId: id,
                 order: startingPoint
             })
         }

@@ -283,7 +283,9 @@ class PaintController {
         }
 
         const images = await Image.findAll({
-            where: {paintId: id}
+            where: {
+                entityId: id
+            }
         })
 
         images.forEach(i => {
@@ -302,7 +304,7 @@ class PaintController {
         await Image.destroy(
             {
                 where: {
-                    paintId: id
+                    entityId: id
                 }
             }
         )

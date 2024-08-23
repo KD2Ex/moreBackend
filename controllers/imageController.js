@@ -10,6 +10,8 @@ class ImageController {
         const {paintId} = req.body;
         const {id} = req.files;
 
+        throw new Error("Unimplemented. WTF code area");
+
         const image = await Image.create({paintId, name});
         return res.json(image);
 

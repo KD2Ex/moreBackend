@@ -1,5 +1,5 @@
 const ApiError = require('../error/ApiError')
-const {Project, ProjectImage, Locale, LocaleTextProject, LocaleTextPainting} = require("../models/models");
+const {Project, ProjectImage, Locale, LocaleTextProject, LocaleTextPainting, Paint} = require("../models/models");
 const PaintingUtils = require('../utils/paintingUtils')
 const fs = require("node:fs");
 const path = require("path");
@@ -254,7 +254,7 @@ class ProjectController {
 
 
             const images = await ProjectImage.findAll({
-                where: {projectId: id}
+                where: {entityId: id}
             })
 
             images.forEach(i => {
@@ -273,7 +273,7 @@ class ProjectController {
             })
 
             await ProjectImage.destroy({
-                where: {projectId: id}
+                where: {entityId: id}
             })
 
             await Project.destroy({
@@ -288,7 +288,10 @@ class ProjectController {
     }
     async deleteAll(req, res, next) {
         try {
-
+            await Project.truncate({
+                cascade: true
+            });
+            return res.status(200).json('All records deleted')
         } catch (e) {
             return next(ApiError.badRequest(e.message))
         }

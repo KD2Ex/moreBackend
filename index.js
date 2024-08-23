@@ -20,6 +20,12 @@ app.use(express.static(path.resolve(__dirname, 'static')));
 app.use(fileUpload({}));
 app.use('/api', router);
 
+app.use(express.static(path.resolve(__dirname, 'dist')))
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+})
+
 
 app.use(errorHandler);
 
@@ -27,7 +33,7 @@ const start = async () => {
     try {
         await sequelize.authenticate()
         await sequelize.sync({alter: true})
-        app.listen(PORT, () => console.log(`Server started on port ${PORT}`))
+        app.listen(PORT, () => console.log(`Server started on port ${PORT} ${path.join(__dirname, '..', '..', 'dist')}`))
     } catch (e) {
         console.log(e)
     }
