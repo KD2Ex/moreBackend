@@ -139,12 +139,12 @@ class PaintController {
 
             for (const painting of result.paintings) {
 
-                painting.images.forEach(img => {
+                /*painting.images.forEach(img => {
                     const split = img.name.split('.');
                     split[1] = 'webp';
                     img.name = split.join('.');
                     return img;
-                })
+                })*/
 
                 const locales = await LocaleTextPainting.findAll({
                     where: {
