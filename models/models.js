@@ -9,7 +9,7 @@ const Paint = sequelize.define('paint', {
     desc: {type: DataTypes.TEXT, allowNull: true},
     width: {type: DataTypes.INTEGER,},
     height: {type: DataTypes.INTEGER,},
-    relativeSize: {type: DataTypes.INTEGER, },
+    relativeSize: {type: DataTypes.FLOAT, },
     objectFit: {type: DataTypes.STRING, },
     order: {type: DataTypes.INTEGER, }
 })
