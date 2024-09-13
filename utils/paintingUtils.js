@@ -21,7 +21,7 @@ class PaintingUtils {
             source: INPUT_path_to_your_images,
             destination: OUTPUT_path,
             enginesSetup: {
-                jpg: { engine: 'webp', command: ['-q', '60']},
+                jpg: { engine: 'mozjpeg', command: ['-quality', '60']},
                 png: { engine: 'pngquant', command: ['--quality=20-50', '-o']},
             }
         });
