@@ -21,8 +21,8 @@ class PaintingUtils {
             source: INPUT_path_to_your_images,
             destination: OUTPUT_path,
             enginesSetup: {
-                jpg: { engine: 'webp', command: false},
-                png: { engine: 'pngquant', command: false},
+                jpg: { engine: 'webp', command: ['-q', '60']},
+                png: { engine: 'pngquant', command: ['--quality=20-50', '-o']},
             }
         });
 
