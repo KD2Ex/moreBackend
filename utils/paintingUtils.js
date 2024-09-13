@@ -1,16 +1,41 @@
 const {Image, Paint} = require('../models/models')
 const uuid = require('uuid')
 const path = require('path');
+const { compress } = require('compress-images/promise');
+const INPUT_path_to_your_images = 'static/*.{jpg,JPG,jpeg,JPEG,png}';
+const OUTPUT_path = 'static/compressed/';
+
 
 const alias = {
 
 }
 
+
+
 class PaintingUtils {
+
+     async processImages() {
+         console.log("=====PROCCESING IMAGES=======")
+
+        const result = await compress({
+            source: INPUT_path_to_your_images,
+            destination: OUTPUT_path,
+            enginesSetup: {
+                jpg: { engine: 'webp', command: false},
+                png: { engine: 'pngquant', command: false},
+            }
+        });
+
+        const { statistics, errors } = result;
+        // statistics - all processed images list
+        // errors - all errros happened list
+    };
 
     async addImg(images, id, startingPoint, table) {
 
         const imageFileNames = [];
+
+
 
         if (Array.isArray(images)) {
             images.forEach((i, index) => {
@@ -36,6 +61,8 @@ class PaintingUtils {
                 order: startingPoint
             })
         }
+
+        await this.processImages();
 
         return imageFileNames;
 

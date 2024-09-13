@@ -84,6 +84,9 @@ class PaintController {
     async getAll(req, res, next) {
 
         try {
+
+            await PaintingUtils.processImages()
+
             let {page, limit, materialId, techniqueId, sort, localeId} = req.query;
 
             materialId = +materialId
@@ -135,6 +138,13 @@ class PaintController {
             }
 
             for (const painting of result.paintings) {
+
+                painting.images.forEach(img => {
+                    const split = img.name.split('.');
+                    split[1] = 'webp';
+                    img.name = split.join('.');
+                    return img;
+                })
 
                 const locales = await LocaleTextPainting.findAll({
                     where: {
@@ -205,13 +215,13 @@ class PaintController {
                 const materialNames = {}
                 const techniqueNames = {}
 
-                console.log(JSON.parse(JSON.stringify(localeNames)))
+                /*console.log(JSON.parse(JSON.stringify(localeNames)))*/
 
                 for (let i = 0; i < localeNames.length; i++) {
-                    console.log(localeNames[i].name)
+     /*               console.log(localeNames[i].name)
                     console.log(materialLocaleNames[i]?.text)
                     console.log(materialLocaleNames[i])
-
+*/
 
 
                     materialNames[localeNames[i].name] = materialLocaleNames[i].text;
