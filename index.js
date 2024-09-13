@@ -12,7 +12,10 @@ const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(cors({
     credentials: true,
-    origin: ['http://192.168.0.104:5173', 'http://192.168.222.89:5173', 'http://192.168.0.12:4173', 'https://sour-games-divide.loca.lt', 'http://localhost:5173']
+    origin: [
+        'http://art-space-mo.com',
+        'https://art-space-mo.com',
+        'http://localhost:5173']
 }));
 
 app.use(express.json());
