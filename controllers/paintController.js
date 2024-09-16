@@ -36,6 +36,8 @@ class PaintController {
             const [localeTitles, localeDesc, localePrice] =
                 Utilities.extractLocaleObjects([title, desc, price])
 
+
+
             const painting = await Paint.create({
                 title,
                 desc,
@@ -65,6 +67,9 @@ class PaintController {
 
             const result = JSON.parse(JSON.stringify(painting));
             result.images = imageFileNames;
+            result.title = localeTitles;
+            result.desc  = localeDesc;
+            result.price  = localePrice;
 
 
             /*result.material = {

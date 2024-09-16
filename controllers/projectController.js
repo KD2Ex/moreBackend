@@ -53,12 +53,15 @@ class ProjectController {
                     desc: localeDesc[locale.name],
                     cost: localeCost[locale.name],
                     timePeriod: localeTimePeriod[locale.name],
-                    address: localeTimePeriod[locale.name],
+                    address: localeAddress[locale.name],
                 })
             }
-
             const result = JSON.parse(JSON.stringify(project))
             result.images = createdImages
+            result.title = localeTitles
+            result.cost = localeCost;
+            result.timePeriod = localeTimePeriod;
+            result.address = localeAddress;
 
             return res.json(result);
 
