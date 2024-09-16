@@ -4,7 +4,7 @@ const {DataTypes} = require('sequelize')
 
 const Paint = sequelize.define('paint', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    title: {type: DataTypes.STRING, unique: true, },
+    title: {type: DataTypes.STRING },
     price: {type: DataTypes.INTEGER, },
     desc: {type: DataTypes.TEXT, allowNull: true},
     width: {type: DataTypes.INTEGER,},
@@ -27,17 +27,17 @@ const ObjectFit = sequelize.define('objectFit', {
 
 const Material = sequelize.define('material', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.STRING, allowNull: false, unique: true}
+    name: {type: DataTypes.STRING, allowNull: false}
 })
 
 const Technique = sequelize.define('technique', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.STRING, allowNull: false, unique: true}
+    name: {type: DataTypes.STRING, allowNull: false}
 })
 
 const User = sequelize.define('user', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    login: {type: DataTypes.STRING, allowNull: false, unique: true},
+    login: {type: DataTypes.STRING, allowNull: false },
     password: {type: DataTypes.STRING, allowNull: false}
 })
 
