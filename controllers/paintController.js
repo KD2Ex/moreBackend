@@ -308,6 +308,10 @@ class PaintController {
                 if (err) throw err;
                 console.log('file was deleted')
             })
+            fs.unlink(path.resolve(__dirname, '..', 'static', 'compressed', i.name), (err) => {
+                if (err) throw err;
+                console.log('file was deleted')
+            })
         })
 
         await LocaleTextPainting.destroy({

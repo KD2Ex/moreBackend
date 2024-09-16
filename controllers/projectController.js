@@ -267,6 +267,11 @@ class ProjectController {
                     }
                     console.log('file was deleted')
                 })
+
+                fs.unlink(path.resolve(__dirname, '..', 'static', 'compressed', i.name), (err) => {
+                    if (err) next(ApiError.badRequest(err.message))
+                    console.log('file was deleted')
+                })
             })
 
             await LocaleTextProject.destroy({
