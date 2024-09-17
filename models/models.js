@@ -68,7 +68,7 @@ const ProjectImage = sequelize.define('projectImage', {
 const Locale = sequelize.define("locale", {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     name: {type: DataTypes.STRING, allowNull: false}
-})
+}, {timestamps: false})
 
 const LocaleTextMaterial = sequelize.define('localeTextMaterial', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
