@@ -469,6 +469,8 @@ class PaintController {
 
             }
 
+            return res.status(200).json('ok')
+
         } catch (e) {
             return next(ApiError.badRequest(e.message))
         }
