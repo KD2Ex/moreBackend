@@ -1,15 +1,10 @@
 const {Image, Paint} = require('../models/models')
 const uuid = require('uuid')
 const path = require('path');
+const fs = require('fs');
 const { compress } = require('compress-images/promise');
 const INPUT_path_to_your_images = 'static/*.{jpg,JPG,jpeg,JPEG,png}';
 const OUTPUT_path = 'static/compressed/';
-
-
-const alias = {
-
-}
-
 
 
 class PaintingUtils {
@@ -27,6 +22,26 @@ class PaintingUtils {
         });
 
         const { statistics, errors } = result;
+
+         for (let err of errors) {
+             console.log("Error: ")
+             console.log(err)
+
+             const name = err.input.split('/')[1];
+
+             console.log(name)
+
+             fs.unlink(err.output + name, (error) => {
+                 if (error) {
+                     console.error("error removing file " + error)
+
+                 }
+                 console.log(err.output + name)
+             })
+
+             await fs.rename(`static/${name}` ,`static/compressed/${name}`, () => {})
+         }
+
         // statistics - all processed images list
         // errors - all errros happened list
     };

@@ -53,13 +53,8 @@ const Token = sequelize.define('token', {
 
 const Project = sequelize.define('project', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    title: {type: DataTypes.STRING, allowNull: false},
-    desc: {type: DataTypes.TEXT },
-    cost: {type: DataTypes.INTEGER },
     levels: {type: DataTypes.INTEGER, allowNull: true},
     area: {type: DataTypes.INTEGER, allowNull: true},
-    timePeriod: {type: DataTypes.STRING, allowNull: true},
-    address: {type: DataTypes.STRING, allowNull: true},
     order: {type: DataTypes.INTEGER, allowNull: true},
     height: {type: DataTypes.INTEGER, allowNull: true}
 })

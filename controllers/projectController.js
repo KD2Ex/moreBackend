@@ -8,36 +8,82 @@ const Utilities = require('../utils/utilities')
 
 class ProjectController {
 
+
+    async createLocaleData(req, res, next) {
+        try {
+            const {
+                title,
+                desc,
+                cost,
+                address,
+                timePeriod,
+                projectId
+            } = req.body;
+
+            const locales = await Locale.findAll();
+
+            for (let i = 0; i < locales.length; ++i) {
+
+                const id = locales[i].id;
+                const titleName = title.find(i => i.localeId === id)?.name;
+                const descName = desc.find(i => i.localeId === id)?.name;
+                const costName = cost.find(i => i.localeId === id)?.name;
+                const addressName = address.find(i => i.localeId === id)?.name;
+                const timePeriodName = timePeriod.find(i => i.localeId === id)?.name;
+
+                console.log({
+                    t: titleName,
+                    d: descName,
+                    p: costName,
+                    address: addressName,
+                    time: timePeriodName,
+                    lId: id,
+                    pId: projectId
+                })
+
+                if (
+                    !titleName
+                    || !descName
+                    || !costName
+                    || !addressName
+                    || !timePeriodName
+                ) return next(ApiError.badRequest("Check the locale data"))
+
+                const response = await LocaleTextProject.create({
+                    title: titleName,
+                    desc: descName,
+                    cost: costName,
+                    address: addressName,
+                    timePeriod: timePeriodName,
+                    localeId: id,
+                    projectId: projectId
+                })
+            }
+
+            return res.status(200).json(req.body);
+        } catch (e) {
+            return next(ApiError.badRequest(e.message))
+        }
+    }
+
     async create(req, res, next) {
 
         try {
 
             const {
-                title,
-                desc,
-                cost,
                 levels,
                 area,
-                timePeriod,
-                address
             } = req.body
             const {images} = req.files;
 
             let order = await Project.max('order');
             ++order;
 
-            const locales = await Locale.findAll();
-            const [localeTitles, localeDesc, localeCost, localeTimePeriod, localeAddress] =
-                Utilities.extractLocaleObjects([title, desc, cost, timePeriod, address])
+
 
             const project = await Project.create({
-                title,
-                desc,
-                cost: 0,
                 levels,
                 area,
-                timePeriod,
-                address,
                 order,
                 height: 400
             })
@@ -45,23 +91,9 @@ class ProjectController {
             const createdImages = await PaintingUtils
                 .addImg(images, project.id, 0, ProjectImage)
 
-            for (const locale of locales) {
-                await LocaleTextProject.create({
-                    projectId: project.id,
-                    localeId: locale.id,
-                    title: localeTitles[locale.name],
-                    desc: localeDesc[locale.name],
-                    cost: localeCost[locale.name],
-                    timePeriod: localeTimePeriod[locale.name],
-                    address: localeAddress[locale.name],
-                })
-            }
+
             const result = JSON.parse(JSON.stringify(project))
             result.images = createdImages
-            result.title = localeTitles
-            result.cost = localeCost;
-            result.timePeriod = localeTimePeriod;
-            result.address = localeAddress;
 
             return res.json(result);
 
@@ -74,6 +106,8 @@ class ProjectController {
 
     async getAll(req, res, next) {
         try {
+
+            await PaintingUtils.processImages()
 
             let {page, limit} = req.query
 
@@ -143,18 +177,83 @@ class ProjectController {
         }
     }
 
+    async updateLocaleData(req, res, next) {
+        try {
+
+            const {
+                title,
+                desc,
+                cost,
+                address,
+                timePeriod,
+                projectId
+            } = req.body;
+
+            console.log(req.body)
+
+            const localeTexts = await LocaleTextProject.findAll({
+                where: {
+                    projectId: projectId
+                }
+            });
+
+            for (let i = 0; i < localeTexts.length; ++i) {
+
+
+                const id = localeTexts[i].localeId;
+                const titleName = title.find(i => i.localeId === id)?.name;
+                const descName = desc.find(i => i.localeId === id)?.name;
+                const costName = cost.find(i => i.localeId === id)?.name;
+                const addressName = address.find(i => i.localeId === id)?.name;
+                const timePeriodName = timePeriod.find(i => i.localeId === id)?.name;
+
+                console.log({
+                    t: titleName,
+                    d: descName,
+                    p: costName,
+                    address: addressName,
+                    time: timePeriodName,
+                    lId: id,
+                    pId: projectId
+                })
+
+                if (
+                    !titleName
+                    || !descName
+                    || !costName
+                    || !addressName
+                    || !timePeriodName
+                ) return next(ApiError.badRequest("Check the locale data"))
+
+
+
+
+                localeTexts[i].set({
+                    title: titleName,
+                    desc: descName,
+                    cost: costName,
+                    address: addressName,
+                    timePeriod: timePeriodName,
+                    localeId: id,
+                    projectId: projectId
+                })
+
+                await localeTexts[i].save()
+            }
+
+            return res.status(200).json(req.body);
+
+        } catch (e) {
+            return next(ApiError.badRequest(e.message))
+        }
+    }
 
     async update(req, res, next) {
         try {
             const {
                 id,
-                title,
-                desc,
-                cost,
                 levels,
                 area,
-                timePeriod,
-                address
             } = req.body
 
             let images = null
@@ -163,12 +262,6 @@ class ProjectController {
                 images = req.files.images
             }
 
-            const locales = await Locale.findAll();
-
-            const [localeTitles, localeDesc, localeCost, localeTimePeriod, localeAddress] =
-                Utilities.extractLocaleObjects([title, desc, cost, timePeriod, address])
-
-            console.log(req.files)
 
             const project = await Project.findByPk(id, {
                 include: [
@@ -184,26 +277,6 @@ class ProjectController {
                 levels,
                 area,
             })
-
-            const localeTexts = await LocaleTextProject.findAll({
-                where: {
-                    projectId: project.id
-                }
-            })
-
-            for (const item of localeTexts) {
-
-                const locale = locales.find(i => i.id === item.localeId).name;
-
-                item.set({
-                    title: localeTitles[locale],
-                    desc: localeDesc[locale],
-                    cost: localeCost[locale],
-                    timePeriod: localeTimePeriod[locale],
-                    address: localeAddress[locale],
-                })
-                await item.save();
-            }
 
             const json = JSON.parse(JSON.stringify(project));
 

@@ -10,11 +10,6 @@ const Utilities = require('../utils/utilities')
 
 class PaintController {
 
-    findRecord(array, id) {
-        return array.find(i => i.id === id)
-    }
-
-
     async createLocaleData(req, res, next) {
         try {
 
@@ -30,9 +25,6 @@ class PaintController {
             const locales = await Locale.findAll();
 
             for (let i = 0; i < locales.length; ++i) {
-                if (i > title.length - 1) break;
-                if (i > desc.length - 1) break;
-                if (i > price.length - 1) break;
 
                 const id = locales[i].id;
                 const titleName = title.find(i => i.localeId === id)?.name;
