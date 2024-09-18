@@ -4,15 +4,20 @@ const {DataTypes} = require('sequelize')
 
 const Paint = sequelize.define('paint', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    title: {type: DataTypes.STRING },
-    price: {type: DataTypes.INTEGER, },
-    desc: {type: DataTypes.TEXT, allowNull: true},
     width: {type: DataTypes.INTEGER,},
     height: {type: DataTypes.INTEGER,},
     relativeSize: {type: DataTypes.FLOAT, },
     objectFit: {type: DataTypes.STRING, },
     order: {type: DataTypes.INTEGER, }
 })
+
+const LocaleTextPainting = sequelize.define('localeTextPainting', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    title: {type: DataTypes.TEXT, allowNull: false},
+    desc: {type: DataTypes.TEXT, allowNull: false},
+    price: {type: DataTypes.STRING, allowNull: false}, // price used to be in a separate table
+})
+
 
 const Image = sequelize.define('image', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -78,13 +83,6 @@ const LocaleTextMaterial = sequelize.define('localeTextMaterial', {
 const LocaleTextTechnique = sequelize.define('localeTextTechnique', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     text: {type: DataTypes.STRING, allowNull: false}
-})
-
-const LocaleTextPainting = sequelize.define('localeTextPainting', {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    title: {type: DataTypes.STRING(100), allowNull: false},
-    desc: {type: DataTypes.STRING(2000), allowNull: false},
-    price: {type: DataTypes.STRING, allowNull: false},
 })
 
 const LocaleTextProject = sequelize.define('localeTextProject', {

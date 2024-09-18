@@ -10,12 +10,64 @@ const Utilities = require('../utils/utilities')
 
 class PaintController {
 
-    async create(req, res, next) {
+    findRecord(array, id) {
+        return array.find(i => i.id === id)
+    }
+
+
+    async createLocaleData(req, res, next) {
         try {
+
             const {
                 title,
                 desc,
                 price,
+                paintId
+            } = req.body;
+
+            console.log(req.body)
+
+            const locales = await Locale.findAll();
+
+            for (let i = 0; i < locales.length; ++i) {
+                if (i > title.length - 1) break;
+                if (i > desc.length - 1) break;
+                if (i > price.length - 1) break;
+
+                const id = locales[i].id;
+                const titleName = title.find(i => i.localeId === id)?.name;
+                const descName = desc.find(i => i.localeId === id)?.name;
+                const priceName = price.find(i => i.localeId === id)?.name;
+
+                console.log({
+                    t: titleName,
+                    d: descName,
+                    p: priceName,
+                    lId: id,
+                    pId: paintId
+                })
+
+                if (!titleName || !descName || !priceName) return next(ApiError.badRequest("Check the locale data"))
+
+
+                const response = await LocaleTextPainting.create({
+                    title: titleName,
+                    desc: descName,
+                    price: priceName,
+                    localeId: id,
+                    paintId: paintId
+                })
+            }
+
+            return res.status(200).json(req.body)
+        } catch (e) {
+            return next(ApiError.badRequest(e.message))
+        }
+    }
+
+    async create(req, res, next) {
+        try {
+            const {
                 width,
                 height,
                 relativeSize,
@@ -31,17 +83,7 @@ class PaintController {
             let order = await Paint.max('order');
             ++order;
 
-            const locales = await Locale.findAll();
-
-            const [localeTitles, localeDesc, localePrice] =
-                Utilities.extractLocaleObjects([title, desc, price])
-
-
-
             const painting = await Paint.create({
-                title,
-                desc,
-                price: 0,
                 width,
                 height,
                 relativeSize,
@@ -54,30 +96,12 @@ class PaintController {
             const imageFileNames = await PaintingUtils
                 .addImg(images, painting.id, 0, Image);
 
-            for (const locale of locales) {
-
-                const localeTextPainting = await LocaleTextPainting.create({
-                    title: localeTitles[locale.name],
-                    desc: localeDesc[locale.name],
-                    price: localePrice[locale.name],
-                    localeId: locale.id,
-                    paintId: painting.id
-                })
-            }
 
             const result = JSON.parse(JSON.stringify(painting));
             result.images = imageFileNames;
-            result.title = localeTitles;
-            result.desc  = localeDesc;
-            result.price  = localePrice;
 
 
-            /*result.material = {
-                id: result.materialId,
-                name: result
-            }*/
-            //res.json(painting)
-            return res.json(result);
+            return res.status(200).json(result);
 
         } catch (e) {
 
@@ -144,12 +168,6 @@ class PaintController {
 
             for (const painting of result.paintings) {
 
-                /*painting.images.forEach(img => {
-                    const split = img.name.split('.');
-                    split[1] = 'webp';
-                    img.name = split.join('.');
-                    return img;
-                })*/
 
                 const locales = await LocaleTextPainting.findAll({
                     where: {
@@ -172,18 +190,7 @@ class PaintController {
 
                 }
 
-                /*const locale = locales.find(i => i.localeId === localeId)
-                if (locale) {
-                    painting.title = locale.title;
-                    painting.price = locale.price;
-                    painting.desc = locale.desc;
-                }
-                 */
-
-
                 painting.images.sort((a, b) => a.order - b.order)
-                //const material = await Material.findByPk(painting.materialId)
-                //const technique = await Technique.findByPk(painting.techniqueId)
 
                 const [material, technique] = await Promise.all([
                     Material.findByPk(painting.materialId),
@@ -205,29 +212,12 @@ class PaintController {
                     })
                 ])
 
-               /* const materialLocaleNames = await LocaleTextMaterial.findAll({
-                    where: {
-                        materialId: material.id,
-                    }
-                })
-
-                const techniqueLocaleNames = await LocaleTextTechnique.findAll({
-                    where: {
-                        techniqueId: technique.id,
-                    }
-                })*/
 
                 const materialNames = {}
                 const techniqueNames = {}
 
-                /*console.log(JSON.parse(JSON.stringify(localeNames)))*/
 
                 for (let i = 0; i < localeNames.length; i++) {
-     /*               console.log(localeNames[i].name)
-                    console.log(materialLocaleNames[i]?.text)
-                    console.log(materialLocaleNames[i])
-*/
-
 
                     materialNames[localeNames[i].name] = materialLocaleNames[i].text;
                     techniqueNames[localeNames[i].name] = techniqueLocaleNames[i].text;
@@ -238,31 +228,6 @@ class PaintController {
 
                 technique.name = techniqueLocaleNames ? techniqueNames : technique.name;
                 painting.technique = technique
-
-
-               /* materialLocaleNames.forEach(i => {
-                    const localeName = localeNames.find(lName => lName.id === i.localeId).name
-                    materialNames[localeName] = i.text;
-                })
-                techniqueLocaleNames.forEach(i => {
-                    const localeName = localeNames.find(lName => lName.id === i.localeId).name
-                    techniqueNames[localeName] = i.text;
-                })*/
-
-
-                if (painting.materialId) {
-                    /*if (materialId !== 0 && material.id === materialId) {
-                        filteredPaintings.push(painting);
-                    }*/
-                }
-
-                if (painting.techniqueId) {
-
-
-                    /*if (techniqueId !== 0 && technique.id === techniqueId) {
-                        filteredPaintings.push(painting);
-                    }*/
-                }
 
                 delete painting.materialId;
                 delete painting.techniqueId;
@@ -371,16 +336,76 @@ class PaintController {
 
         } catch (e) {
 
-            next(ApiError.badRequest(e.message))
+            return next(ApiError.badRequest(e.message))
 
         }
+    }
+
+
+    async updateLocaleData(req, res, next) {
+
+        try {
+            const {
+                id,
+                title,
+                desc,
+                price
+            } = req.body;
+
+            const localeTexts = await LocaleTextPainting.findAll({
+                where: {
+                    paintId: id
+                }
+            })
+
+            for (let i = 0; i < localeTexts.length; ++i) {
+
+                const localeId = localeTexts[i].localeId;
+                const titleName = title.find(i => i.localeId === localeId)?.name;
+                const descName = desc.find(i => i.localeId === localeId)?.name;
+                const priceName = price.find(i => i.localeId === localeId)?.name;
+
+                console.log({
+                    t: titleName,
+                    d: descName,
+                    p: priceName,
+                    lId: localeId,
+                    pId: localeId
+                })
+
+                if (!titleName || !descName || !priceName) return next(ApiError.badRequest("Check the locale data"))
+
+
+                localeTexts[i].set({
+                    title: titleName,
+                    desc: descName,
+                    price: priceName,
+                })
+
+                await localeTexts[i].save();
+            }
+
+            return res.status(200).json(req.body);
+
+        } catch (e) {
+            return next(ApiError.badRequest(e.message))
+        }
+
+
     }
 
     async updatePainting(req, res, next) {
 
         try {
 
-            const {id, title, desc, price, width, height, materialId, techniqueId} = req.body;
+            const
+                {
+                    id,
+                    width,
+                    height,
+                    materialId,
+                    techniqueId
+                } = req.body;
             let images = null;
             let result = [];
 
@@ -408,10 +433,12 @@ class PaintController {
                     paintId: painting.id
                 }
             })
-
+            console.log('411')
+            console.log(localeDesc)
             for (let item of localeTexts) {
 
                 const locale = locales.find(i => i.id === item.localeId).name;
+
 
                 item.set({
                     title: localeTitles[locale],
