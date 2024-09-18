@@ -413,10 +413,7 @@ class PaintController {
                 images = req.files.images;
             }
 
-            const locales = await Locale.findAll();
 
-            const [localeTitles, localeDesc, localePrice] =
-                Utilities.extractLocaleObjects([title, desc, price])
             console.log(req.files)
 
             const painting = await Paint.findByPk(id, {
@@ -428,24 +425,7 @@ class PaintController {
                 ],
             });
 
-            const localeTexts = await LocaleTextPainting.findAll({
-                where: {
-                    paintId: painting.id
-                }
-            })
-            console.log('411')
-            console.log(localeDesc)
-            for (let item of localeTexts) {
 
-                const locale = locales.find(i => i.id === item.localeId).name;
-
-
-                item.set({
-                    title: localeTitles[locale],
-                    desc: localeDesc[locale],
-                    price: localePrice[locale],
-                })
-            }
 
             painting.set({
                 width: width,
@@ -464,9 +444,7 @@ class PaintController {
                 result = imageFileNames;
             }
 
-            for (let item of localeTexts) {
-                await item.save();
-            }
+
             await painting.save();
 
             return res.status(200).json(result)
